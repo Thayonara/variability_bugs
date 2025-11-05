@@ -1,0 +1,2 @@
+project_name,repository_url,commit_hash,parent_commit_hash,author,date,message,variability_bug,bug_probability,matched_features,files_changed,build_system_affected,impact_scope,feature_scope,json_source_file,repo_dir
+esp-aliyun,https://github.com/espressif/esp-aliyun,4d2bc566d734d9947898587ff3aa9eec56f12b81,17f53de4a2f62533538a81eec41f5e17f98796d6,Chen Wu,2018-03-06,bugfix(ssl): double load CA\n\ncause by MQTT_DIRECT not defined as global,1,0.9997236132621764,MQTT_DIRECT,"Makefile, include/aliyun_config.h",1,build system,networking/protocol,esp-aliyun.json,repos/esp-aliyun
