@@ -1,0 +1,21 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background: #fafafa;
+}
+
+header {
+    padding-bottom: 20px;
+}
+
+h1 {
+    margin-bottom: 5px;
+}
+
+table {
+    font-size: 14px;
+}
+
+#chart_project, #chart_feature_scope, #chart_impact_scope {
+    margin-top: 30px;
+}

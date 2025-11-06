@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Variability Bug Dataset Explorer</title>
+
+<!-- DataTables -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+
+<!-- Custom style -->
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+<header>
+  <h1>Variability Bug Dataset Explorer</h1>
+  <p>Public dataset of variability bugs collected across open source systems.</p>
+</header>
+
+<section>
+  <h2>Dataset Table</h2>
+  <table id="bugsTable" class="display" width="100%"></table>
+</section>
+
+<hr>
+
+<section>
+  <h2>Visual Analytics</h2>
+
+  <div id="chart_project"></div>
+  <div id="chart_feature_scope"></div>
+  <div id="chart_impact_scope"></div>
+
+</section>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<script src="script.js"></script>
+
+</body>
+</html>
