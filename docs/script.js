@@ -1,82 +1,77 @@
-const dataPath = "projects_split/";
+const DATA_PATH = "data/";
 
-async function listCSVFiles() {
-    const response = await fetch(dataPath);
+async function listProjectFiles() {
+    const response = await fetch(DATA_PATH);
     const text = await response.text();
-    
-    const links = [...text.matchAll(/href="([^"]+\.csv)"/g)].map(m => m[1]);
-    return links;
+
+    const files = [...text.matchAll(/href="([^"]+\.csv)"/g)].map(m => m[1]);
+    return files;
 }
 
 async function loadCSV(file) {
-    const response = await fetch(dataPath + file);
+    const response = await fetch(DATA_PATH + file);
     const text = await response.text();
-    
-    const rows = text.split("\n").slice(1);
-    const headers = text.split("\n")[0].split(",");
-
-    const data = rows.filter(r => r.trim() !== "").map(line => {
-        const values = line.split(",");
+    const rows = text.trim().split("\n");
+    const headers = rows[0].split(",");
+    const data = rows.slice(1).map(r => {
+        const values = r.split(",");
         return headers.reduce((obj, h, idx) => {
             obj[h] = values[idx];
             return obj;
         }, {});
     });
+    return { headers, data };
+}
 
-    $('#bugsTable').DataTable().clear().destroy();
-    $('#bugsTable').DataTable({
-        data,
+function renderTable(headers, data) {
+    if ($.fn.dataTable.isDataTable("#bugsTable"))
+        $("#bugsTable").DataTable().destroy();
+
+    $("#bugsTable").empty();
+
+    $("#bugsTable").DataTable({
+        data: data,
         columns: headers.map(h => ({ title: h, data: h })),
-        pageLength: 20,
-        searchHighlight: true
+        pageLength: 20
     });
+}
 
-    return data;
+function plotCounts(data, field, divId, title) {
+    const counts = data.reduce((acc, row) => {
+        acc[row[field]] = (acc[row[field]] ?? 0) + 1;
+        return acc;
+    }, {});
+
+    Plotly.newPlot(divId, [{
+        x: Object.keys(counts),
+        y: Object.values(counts),
+        type: "bar"
+    }], { title });
+}
+
+async function loadProject(file) {
+    const { headers, data } = await loadCSV(file);
+    renderTable(headers, data);
+    plotCounts(data, "feature_scope", "chart_feature_scope", "Feature Scope");
+    plotCounts(data, "impact_scope", "chart_impact_scope", "Impact Scope");
 }
 
 async function init() {
-    const files = await listCSVFiles();
-    const selector = document.createElement("select");
-    selector.id = "projectSelect";
+    const files = await listProjectFiles();
 
+    const selector = document.getElementById("projectSelector");
     files.forEach(f => {
-        let opt = document.createElement("option");
+        const opt = document.createElement("option");
         opt.value = f;
-        opt.textContent = f.replace(".csv","");
+        opt.textContent = f.replace(".csv", "");
         selector.appendChild(opt);
     });
 
-    document.body.prepend(selector);
-    
-    selector.addEventListener("change", async () => {
-        const data = await loadCSV(selector.value);
-        plotData(data);
-    });
+    selector.addEventListener("change", e => loadProject(e.target.value));
 
-    const first = files[0];
-    const data = await loadCSV(first);
-    plotData(data);
-}
-
-function plotData(data) {
-    function countBy(key) {
-        return data.reduce((a, r) => {
-            a[r[key]] = (a[r[key]] || 0) + 1;
-            return a;
-        }, {});
-    }
-
-    function plot(key, elemId, title) {
-        const counts = countBy(key);
-        Plotly.newPlot(elemId, [{
-            x: Object.keys(counts),
-            y: Object.values(counts),
-            type: 'bar'
-        }], { title });
-    }
-
-    plot("feature_scope", "chart_feature_scope", "Feature Scope");
-    plot("impact_scope", "chart_impact_scope", "Impact Scope");
+    // load first project by default
+    if (files.length > 0) loadProject(files[0]);
 }
 
 init();
+
